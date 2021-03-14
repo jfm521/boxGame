@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class ButtonBehavior : MonoBehaviour
 {
-    bool collideFeet = false;
-    bool collideCube = false;
+    float currentColliders = 0;
     public GameObject doorFriend;
     public GameObject doorPrefab;
     Vector3 doorPos = new Vector3(0, 0, 0);
@@ -25,42 +24,22 @@ public class ButtonBehavior : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Feet")
+        currentColliders += 1;
+        Debug.Log("button pressed");
+        if (doorFriend != null)
         {
-            collideFeet = true;
-        }
-        if (other.gameObject.tag == "Cube")
-        {
-            collideCube = true;
-        }
-        if (other.gameObject.tag == "Feet" || other.gameObject.tag == "Cube")
-        {
-            Debug.Log("button pressed");
-            if (doorFriend != null)
-            {
-                Destroy(doorFriend);
-            }
-            
+            Destroy(doorFriend);
         }
     }
+
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Feet")
+        currentColliders -= 1;
+            if (currentColliders == 0)
         {
-            collideFeet = false;
+            GameObject newDoor = Instantiate(doorPrefab, doorPos, transform.rotation);
+            doorFriend = newDoor;
         }
-        if (other.gameObject.tag == "Cube")
-        {
-            collideCube = false;
-        }
-        if (other.gameObject.tag == "Feet" || other.gameObject.tag == "Cube")
-        {
-            if (collideCube == false && collideFeet == false)
-            {
-                GameObject newDoor = Instantiate(doorPrefab, transform.position, transform.rotation);
-                newDoor.transform.localPosition = doorPos;
-                doorFriend = newDoor;
-            }
-        }
+        
     }
 }

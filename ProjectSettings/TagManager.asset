@@ -4,13 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Feet
-  - Floor
-  - Enemy
-  - Cube
-  - Button
+  - Interactible
+  - World
   - Door
-  - Star
+  - Button
   layers:
   - Default
   - TransparentFX
@@ -20,14 +17,14 @@ TagManager:
   - UI
   - 
   - 
+  - Interactible
   - Player
-  - Feet
-  - Floor
-  - Enemy
-  - Cube
-  - Button
+  - World
   - Door
-  - Star
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

@@ -6,27 +6,20 @@ public class PlayerBehavior : MonoBehaviour
 {
 
     public float speed;
-    public float jumpHeight;
-    public float gravityMultiplier;
-    public float jumpMultiplier;
-    public float starGoal;
+    float xDir;
+    float yDir;
+
+    /* float xVel = 0;
+    float yVel = 0;
+    public float acc;
+    public float dec;
+    public float drag; */
 
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
     SpriteRenderer myRenderer;
 
-    public GameObject winScreen;
-
-    public Sprite jumpSprite;
     public Sprite walkSprite;
-
-    float moveDir = 1;
-    float starCount = 0;
-
-    bool onFloor = true;
-    bool wonGame = false;
-
-    public static bool faceRight = true;
 
     // Start is called before the first frame update
     void Start()
@@ -41,97 +34,49 @@ public class PlayerBehavior : MonoBehaviour
     {
         
     }
-
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if (wonGame)
-        {
-
-        }
-        else
-        {
-
-            if (onFloor && myBody.velocity.y > 0)
-            {
-                onFloor = false;
-            }
-
-            CheckKeys();
-            HandleMovement();
-            JumpPhysics();
-        }
+        CheckKeys();
+        HandleMovement();
     }
 
     void CheckKeys()
     {
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
         {
-            moveDir = 1;
-            faceRight = true;
-            myRenderer.flipX = false;
+            //Debug.Log("W");
+            yDir = 1;
         }
-        else if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
-            moveDir = -1;
-            faceRight = false;
-            myRenderer.flipX = true;
+            //Debug.Log("A");
+            xDir = -1;
+            //myRenderer.flipX = true;
         }
-        else
+        if (Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))
         {
-            moveDir = 0;
+            yDir = -1;
+            //Debug.Log("S");
         }
-
-        if (Input.GetKey(KeyCode.W) && onFloor)
+        if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
-            myRenderer.sprite = jumpSprite;
-            myBody.velocity = new Vector3(myBody.velocity.x, jumpHeight);
+            xDir = 1;
+            //Debug.Log("D");
+            //myRenderer.flipX = false;
         }
-        else if (!Input.GetKey(KeyCode.W) && myBody.velocity.y > 0)
+        if(!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
         {
-            myBody.velocity += Vector2.up * Physics.gravity.y * (jumpMultiplier - 1f) * Time.deltaTime;
+            yDir = 0;
         }
-    }
-
-    void JumpPhysics()
-    {
-        if(myBody.velocity.y < 0)
+        if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
-            myBody.velocity += Vector2.up * Physics.gravity.y * (gravityMultiplier - 1f) * Time.deltaTime;
+            xDir = 0;
         }
     }
 
     void HandleMovement()
     {
-        myBody.velocity = new Vector3(moveDir * speed, myBody.velocity.y);
+        myBody.velocity = new Vector3(xDir * speed, yDir * speed);
     }
 
-    void OnCollisionEnter2D(Collision2D collisionInfo)
-    {
-        if(collisionInfo.gameObject.tag == "Floor")
-        {
-            myRenderer.sprite = walkSprite;
-            onFloor = true;
-        }
-
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        {
-            if (other.gameObject.tag == "Enemy")
-            {
-                Destroy(gameObject);
-            }
-        }
-        if (other.gameObject.tag == "Star")
-        {
-            Destroy(other.gameObject);
-            starCount += 1;
-            if (starCount >= starGoal)
-            {
-                Vector3 winPos = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, -11);
-                GameObject newWinScreen = Instantiate(winScreen, transform.position, transform.rotation);
-            }
-        }
-    }
 }
