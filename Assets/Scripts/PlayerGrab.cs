@@ -9,6 +9,9 @@ public class PlayerGrab : MonoBehaviour
     public float sightDistMod;
 
     GameObject storedObj;
+    public GameObject xMark;
+    public GameObject xMarkOrange;
+    GameObject currentXMark;
 
     bool objStored = false;
     bool mousePressed = false;
@@ -19,11 +22,25 @@ public class PlayerGrab : MonoBehaviour
 
     public GameObject interactible;
 
+    public List<GameObject> dots = new List<GameObject>();
+    public float dotDist;
+    float dotNumber;
+    public GameObject dot;
+    float dotX;
+    float dotY;
+
     // Start is called before the first frame update
     void Start()
     {
 
+        //this stops the code from dividing by 0 later (IMPORTANT!)
+        if (dotDist <= 0)
+        {
+            dotDist = 1;
+        }
     }
+
+
 
     // Update is called once per frame
     void Update()
@@ -37,11 +54,7 @@ public class PlayerGrab : MonoBehaviour
     private void FixedUpdate()
     {
         //if the mouse has been clicked, play the GrabObject script (which stores and dumps objects)
-        if (mousePressed == true)
-        {
-            mousePressed = false;
-            StoredObject();
-        }
+        StoredObject();
     }
 
     void StoredObject()
@@ -64,34 +77,78 @@ public class PlayerGrab : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, target, sightDist);
         Debug.DrawRay(transform.position, target, Color.red);
 
-        //if there is no object currently stored, store the one you just collided with
-        if (objStored == false)
+        //dropPos is either the mouse's position (if the ray didn't collide with anything) or the point at which the ray collided with something
+        if (hit.collider == null)
         {
-            if (hit.collider != null)
-            {
-                if (hit.collider.tag == "Interactible")
-                {
-                    Debug.Log("Hit interactible");
-                    storedObj = interactible;
-                    Destroy(hit.collider.gameObject);
-                    objStored = true;
-                }
-            }
+            dropPos = new Vector3(mousePos.x, mousePos.y, 1);
         }
-        //if there is an object stored, drop it at the mouse's position
         else
         {
-            if (hit.collider == null)
+            dropPos = new Vector3(hit.point.x, hit.point.y, 1);
+        }
+
+
+        if (mousePressed)
+        {
+            //if there is no object currently stored, store the one you just collided with
+            if (objStored == false)
             {
-            GameObject newObj = Instantiate(storedObj, new Vector3(mousePos.x, mousePos.y, 1), transform.rotation);
-                objStored = false;
+                if (hit.collider != null)
+                {
+                    if (hit.collider.tag == "Interactible")
+                    {
+                        Debug.Log("Hit interactible");
+                        storedObj = interactible;
+                        Destroy(hit.collider.gameObject);
+                        objStored = true;
+                    }
+                }
             }
+
+            //if there is an object stored, drop it at dropPos
             else
             {
-                dropPos = new Vector3(hit.point.x, hit.point.y, 1);
-                GameObject newObj = Instantiate(storedObj, dropPos, transform.rotation);
+                GameObject newObjA = Instantiate(storedObj, dropPos, transform.rotation);
                 objStored = false;
             }
+
+            mousePressed = false;
+        }
+
+        //destroys the current xmark
+        Destroy(currentXMark);
+
+        //places an xmark at the mouse's position or the collision position
+        if (objStored)
+        {
+            GameObject newObjB = Instantiate(xMarkOrange, dropPos, transform.rotation);
+            currentXMark = newObjB;
+        }
+        else
+        {
+            GameObject newObjB = Instantiate(xMark, dropPos, transform.rotation);
+            currentXMark = newObjB;
+        }
+
+        //destroys the current dots and clears the list
+        if (dots.Count != 0)
+        {
+            for(int j = dots.Count; j > 0; j--)
+            {
+                Destroy(dots[j-1]);
+            }
+            dots.Clear();
+        }
+
+        //puts down dots to form a line between the player and dropPos
+        dotNumber = Mathf.Floor(sightDist / dotDist);
+
+        dotX = (dropPos.x - transform.position.x)/dotNumber;
+        dotY = (dropPos.y - transform.position.y)/dotNumber;
+        for(float i = 1; i <= dotNumber; i++)
+        {
+            GameObject newObjC = Instantiate(dot, new Vector3(transform.position.x + (dotX * i), transform.position.y + (dotY * i), 1), transform.rotation);
+            dots.Add(newObjC);
         }
     }
 }

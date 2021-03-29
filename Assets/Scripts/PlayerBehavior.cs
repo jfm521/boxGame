@@ -9,6 +9,10 @@ public class PlayerBehavior : MonoBehaviour
     float xDir;
     float yDir;
 
+    float stars;
+    public float starGoal;
+    public GameObject bigDoor;
+
     /* float xVel = 0;
     float yVel = 0;
     public float acc;
@@ -24,6 +28,7 @@ public class PlayerBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        stars = 0;
         myBody = gameObject.GetComponent<Rigidbody2D>();
         myCollider = gameObject.GetComponent<BoxCollider2D>();
         myRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -32,7 +37,6 @@ public class PlayerBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
     private void FixedUpdate()
     {
@@ -77,6 +81,20 @@ public class PlayerBehavior : MonoBehaviour
     void HandleMovement()
     {
         myBody.velocity = new Vector3(xDir * speed, yDir * speed);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log("Touching");
+        if (other.gameObject.tag == "Star")
+        {
+            Debug.Log("Star");
+            Destroy(other.gameObject);
+            stars += 1;
+            if (stars >= starGoal){
+                Destroy(bigDoor);
+            }
+        }
     }
 
 }

@@ -8,6 +8,8 @@ TagManager:
   - World
   - Door
   - Button
+  - Wall
+  - Star
   layers:
   - Default
   - TransparentFX
@@ -21,8 +23,8 @@ TagManager:
   - Player
   - World
   - Door
-  - 
-  - 
+  - Wall
+  - Star
   - 
   - 
   - 
